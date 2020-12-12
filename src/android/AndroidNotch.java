@@ -10,6 +10,8 @@ import android.view.DisplayCutout;
 import android.view.View;
 import android.view.WindowInsets;
 
+import com.eightbhs.core.util.logger.ServerLogUtil;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
@@ -39,13 +41,10 @@ public class AndroidNotch extends CordovaPlugin {
         if ("getScrollbarHeight".equals(action)) {
             int height = this.getStatusBarHeight();
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, pxToDp(height)));
-
-            Log.d(TAG, "SBHeight: " + height);
             return true;
         }
 
         if (Build.VERSION.SDK_INT < 28) {
-
             // DisplayCutout is not available on api < 28
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, 0));
             return true;
@@ -60,8 +59,6 @@ public class AndroidNotch extends CordovaPlugin {
         }
 
         if ("getInsetsTop".equals(action)) {
-            Log.d(TAG, "System Inset Top:" + insets.getSystemWindowInsetTop());
-
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? pxToDp(cutout.getSafeInsetTop()) : 0));
             return true;
         }
@@ -96,7 +93,10 @@ public class AndroidNotch extends CordovaPlugin {
             return cordova.getActivity().getResources().getDimensionPixelSize(resourceId);
         }
         else {
-            Log.d(TAG, "Unable to get 'status_bar_height' resource");
+            String errMsg = "Unable to get 'status_bar_height' resource";
+            Log.d(TAG, errMsg);
+            ServerLogUtil.getInstance().logException(new Exception(errMsg));
+
             return 0;
         }
     }
