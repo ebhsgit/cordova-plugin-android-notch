@@ -39,8 +39,8 @@ public class AndroidNotch extends CordovaPlugin {
         }
 
         if ("getScrollbarHeight".equals(action)) {
-            int height = this.getStatusBarHeightPX();
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, pxToDp(height)));
+            float height = this.getStatusBarHeightDP();
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, height));
             return true;
         }
 
@@ -94,13 +94,13 @@ public class AndroidNotch extends CordovaPlugin {
     }
 
     /**
-     * Get the status bar height in Pixel
-     * @return
+     * Get the status bar height in DP
      */
-    private int getStatusBarHeightPX() {
+    private float getStatusBarHeightDP() {
         int resourceId = cordova.getActivity().getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            return cordova.getActivity().getResources().getDimensionPixelSize(resourceId);
+            float heightPx = cordova.getActivity().getResources().getDimension(resourceId);
+            return pxToDp(heightPx);
         }
         else {
             String errMsg = "Unable to get 'status_bar_height' resource";
@@ -113,13 +113,12 @@ public class AndroidNotch extends CordovaPlugin {
 
     /**
      * Get the Android default status bar height in DP
-     * @return
      */
     private int getDefaultStatusBarHeightDP() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? 24 : 25;
     }
 
-    private float pxToDp(int px) {
+    private float pxToDp(float px) {
         float density = cordova.getActivity().getResources().getDisplayMetrics().density;
         Log.d(TAG, "Density: " + density);
 
