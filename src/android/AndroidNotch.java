@@ -44,6 +44,12 @@ public class AndroidNotch extends CordovaPlugin {
             return true;
         }
 
+        if ("getDefaultStatusBarHeight".equals(action)) {
+            int height = this.getDefaultStatusBarHeight();
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, pxToDp(height)));
+            return true;
+        }
+
         if (Build.VERSION.SDK_INT < 28) {
             // DisplayCutout is not available on api < 28
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, 0));
@@ -99,6 +105,10 @@ public class AndroidNotch extends CordovaPlugin {
 
             return 0;
         }
+    }
+
+    private int getDefaultStatusBarHeight() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? 24 : 25;
     }
 
     private float pxToDp(int px) {

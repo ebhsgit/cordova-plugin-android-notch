@@ -8,6 +8,10 @@ var AndroidNotch = {
         run(success, error, "AndroidNotch", "getScrollbarHeight");
     },
 
+    getDefaultStatusBarHeight: function(success, error) {
+        run(success, error, "AndroidNotch", "getDefaultStatusBarHeight");
+    },
+    
     hasCutout: function(success, error) {
         run(success, error, "AndroidNotch", "hasCutout");
     },
