@@ -4,11 +4,10 @@
 package com.tobspr.androidnotch;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
+import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowInsets;
 
 import org.apache.cordova.CallbackContext;
@@ -25,24 +24,23 @@ public class AndroidNotch extends CordovaPlugin {
     /**
      * Executes the request and returns PluginResult.
      *
-     * @param action            The action to execute.
-     * @param args              JSONArry of arguments for the plugin.
-     * @param callbackContext   The callback id used when calling back into JavaScript.
-     * @return                  True if the action was valid, false otherwise.
+     * @param action          The action to execute.
+     * @param args            JSONArry of arguments for the plugin.
+     * @param callbackContext The callback id used when calling back into JavaScript.
+     * @return True if the action was valid, false otherwise.
      */
     @Override
     public boolean execute(final String action, final CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
-        final Activity activity = this.cordova.getActivity();
-        final Window window = activity.getWindow();
-
         if ("setLayout".equals(action)) {
             this.webView.getView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             return true;
         }
 
         if ("getScrollbarHeight".equals(action)) {
-            float height = this.getStatusBarHeight();
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, height));
+            int height = this.getStatusBarHeight();
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, pxToDp(height)));
+
+            Log.d(TAG, "SBHeight: " + height);
             return true;
         }
 
@@ -56,30 +54,30 @@ public class AndroidNotch extends CordovaPlugin {
         final WindowInsets insets = getInsets();
         final DisplayCutout cutout = insets.getDisplayCutout();
 
-        float density = activity.getResources().getDisplayMetrics().density;
-
         if ("hasCutout".equals(action)) {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null));
             return true;
         }
 
         if ("getInsetsTop".equals(action)) {
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? (cutout.getSafeInsetTop() / density) : 0));
+            Log.d(TAG, "System Inset Top:" + insets.getSystemWindowInsetTop());
+
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? pxToDp(cutout.getSafeInsetTop()) : 0));
             return true;
         }
 
         if ("getInsetsRight".equals(action)) {
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? (cutout.getSafeInsetRight() / density) : 0));
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? pxToDp(cutout.getSafeInsetRight()) : 0));
             return true;
         }
 
         if ("getInsetsBottom".equals(action)) {
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? (cutout.getSafeInsetBottom() / density) : 0));
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? pxToDp(cutout.getSafeInsetBottom()) : 0));
             return true;
         }
 
         if ("getInsetsLeft".equals(action)) {
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? (cutout.getSafeInsetLeft() / density) : 0));
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cutout != null ? pxToDp(cutout.getSafeInsetLeft()) : 0));
             return true;
         }
 
@@ -92,13 +90,21 @@ public class AndroidNotch extends CordovaPlugin {
         return this.webView.getView().getRootWindowInsets();
     }
 
-    private float getStatusBarHeight() {
-        float statusBarHeight = 0;
+    private int getStatusBarHeight() {
         int resourceId = cordova.getActivity().getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            float scaleRatio = cordova.getActivity().getResources().getDisplayMetrics().density;
-            statusBarHeight = cordova.getActivity().getResources().getDimension(resourceId) / scaleRatio;
+            return cordova.getActivity().getResources().getDimensionPixelSize(resourceId);
         }
-        return statusBarHeight;
+        else {
+            Log.d(TAG, "Unable to get 'status_bar_height' resource");
+            return 0;
+        }
+    }
+
+    private float pxToDp(int px) {
+        float density = cordova.getActivity().getResources().getDisplayMetrics().density;
+        Log.d(TAG, "Density: " + density);
+
+        return px / density;
     }
 }
