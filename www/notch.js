@@ -4,6 +4,9 @@ var run = require("cordova/exec");
 
 var AndroidNotch = {
 
+    getScrollbarHeight: function(success, error) {
+        run(success, error, "AndroidNotch", "getScrollbarHeight");
+    },
 
     hasCutout: function(success, error) {
         run(success, error, "AndroidNotch", "hasCutout");
