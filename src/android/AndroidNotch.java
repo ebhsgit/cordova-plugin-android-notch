@@ -39,14 +39,14 @@ public class AndroidNotch extends CordovaPlugin {
         }
 
         if ("getScrollbarHeight".equals(action)) {
-            int height = this.getStatusBarHeight();
+            int height = this.getStatusBarHeightPX();
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, pxToDp(height)));
             return true;
         }
 
         if ("getDefaultStatusBarHeight".equals(action)) {
-            int height = this.getDefaultStatusBarHeight();
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, pxToDp(height)));
+            int height = this.getDefaultStatusBarHeightDP();
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, height));
             return true;
         }
 
@@ -93,7 +93,11 @@ public class AndroidNotch extends CordovaPlugin {
         return this.webView.getView().getRootWindowInsets();
     }
 
-    private int getStatusBarHeight() {
+    /**
+     * Get the status bar height in Pixel
+     * @return
+     */
+    private int getStatusBarHeightPX() {
         int resourceId = cordova.getActivity().getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
             return cordova.getActivity().getResources().getDimensionPixelSize(resourceId);
@@ -107,7 +111,11 @@ public class AndroidNotch extends CordovaPlugin {
         }
     }
 
-    private int getDefaultStatusBarHeight() {
+    /**
+     * Get the Android default status bar height in DP
+     * @return
+     */
+    private int getDefaultStatusBarHeightDP() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? 24 : 25;
     }
 
